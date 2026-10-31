@@ -8,7 +8,7 @@ Built at **Hacktoberfest Hack Day Yaba x AWS Student Builder Group Unilag** · T
 
 ## How to test (2 minutes)
 
-**Fastest: the live app.** Open the live link in the repo description (top right of this page) on your phone or laptop. Nothing to install. Free hosting sleeps when idle, so the first load can take ~30 seconds.
+**Fastest: the live app.** Open **<https://ojasnap.onrender.com>** on your phone or laptop. Nothing to install. Free hosting sleeps when idle, so the first load can take ~30 seconds.
 
 **Or run it locally:**
 
