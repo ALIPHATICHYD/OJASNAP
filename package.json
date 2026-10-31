@@ -1,0 +1,13 @@
+{
+  "name": "ojasnap",
+  "version": "1.0.0",
+  "description": "Snap a product photo, get a ready-to-post WhatsApp & Instagram listing in English and Pidgin. Built with Gemma 4 via the Gemini API.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "demo": "DEMO=1 node server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}
