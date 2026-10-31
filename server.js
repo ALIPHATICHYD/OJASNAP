@@ -25,7 +25,7 @@ Seller details (may be empty):
 Rules:
 - Describe only what you can actually see, plus the seller's notes. Never invent brand names, sizes or specs you cannot see.
 - If the seller gave a price, use it exactly, in Naira (₦). If not, write "DM for price" in captions and give a cautious price_hint.
-- Keep captions short, warm and natural for Nigerian buyers. Emojis are fine but don't overdo it.
+- Keep captions short, warm and natural for Nigerian buyers. Do not use emojis.
 - The Pidgin caption must be natural Nigerian Pidgin, not a word-for-word translation.
 - The Yoruba caption must be natural, everyday Lagos Yoruba with correct tone marks where you are confident; keep prices and brand words as-is.
 
@@ -130,13 +130,13 @@ const DEMO_LISTING = {
     "Handmade in Lagos",
   ],
   whatsapp_status:
-    "New drop! 🔥 Handmade Ankara tote, roomy enough for your laptop and books. ₦8,500 only. Delivery anywhere in Lagos. Send DM to order before e finish! 🛍️",
+    "New drop! Handmade Ankara tote, roomy enough for your laptop and books. ₦8,500 only. Delivery anywhere in Lagos. Send DM to order before e finish!",
   instagram_caption:
-    "Your everyday bag, but make it Ankara. ✨\nRoomy, strong, and handmade in Lagos.\n₦8,500 · Lagos delivery available.\n#AnkaraBag #LagosVendor #ToteBag #MadeInNigeria #UnilagVendor #LagosFashion #ShopLagos #NaijaBrand",
+    "Your everyday bag, but make it Ankara.\nRoomy, strong, and handmade in Lagos.\n₦8,500 · Lagos delivery available.\n#AnkaraBag #LagosVendor #ToteBag #MadeInNigeria #UnilagVendor #LagosFashion #ShopLagos #NaijaBrand",
   pidgin_caption:
-    "Ankara tote don land! 😍 E big well well, laptop and books go enter. Na ₦8,500 only. We dey deliver anywhere for Lagos. DM sharp sharp!",
+    "Ankara tote don land! E big well well, laptop and books go enter. Na ₦8,500 only. We dey deliver anywhere for Lagos. DM sharp sharp!",
   yoruba_caption:
-    "Àpò Ankara tuntun ti dé! 😍 Ó tóbi, laptop àti ìwé yóò wọ̀ ọ́. ₦8,500 péré. A ń fi ránṣẹ́ sí gbogbo Èkó. Ẹ DM wa kíákíá!",
+    "Àpò Ankara tuntun ti dé! Ó tóbi, laptop àti ìwé yóò wọ̀ ọ́. ₦8,500 péré. A ń fi ránṣẹ́ sí gbogbo Èkó. Ẹ DM wa kíákíá!",
   price_hint: "₦8,500",
   photo_tip: "Shoot it near a window in daylight, and add one photo of someone carrying it so buyers see the size.",
   faq: [
@@ -197,7 +197,7 @@ async function handleReply(req, res) {
   if (DEMO) {
     const pidgin = /\b(abeg|how much|wetin|dey|last price|reduce|na)\b/i.test(message);
     const reply = pidgin
-      ? "Thank you o! Na ₦8,500 be the price and e dey quality. I fit do free delivery if you dey Yaba or Unilag. Make I package am for you?"
+      ? "Thank you o. Na ₦8,500 be the price and e dey quality. I fit do free delivery if you dey Yaba or Unilag. Make I package am for you?"
       : "Thanks for reaching out! It's ₦8,500 and it's handmade with strong stitching. I can do free delivery within Yaba/Unilag. Shall I reserve one for you?";
     return send(res, 200, { reply, model: "demo-mode" });
   }

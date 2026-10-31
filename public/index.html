@@ -3,137 +3,293 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>OjaSnap · Snap it. Post it. Sell it.</title>
-<meta name="description" content="Snap a product photo and get a ready-to-post WhatsApp & Instagram listing in English and Pidgin. Powered by Gemma 4." />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>" />
+<title>OjaSnap — Snap it. Post it. Sell it.</title>
+<meta name="description" content="Snap a product photo and get a ready-to-post WhatsApp & Instagram listing in English, Pidgin and Yoruba. Powered by Gemma 4." />
+<meta name="theme-color" content="#f3f0e8" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111'/%3E%3Cpath d='M9 12h14l-1.4 11.2a2 2 0 0 1-2 1.8h-7.2a2 2 0 0 1-2-1.8z' fill='none' stroke='%23ffd23f' stroke-width='2'/%3E%3Cpath d='M12.5 12V10a3.5 3.5 0 0 1 7 0v2' fill='none' stroke='%23ffd23f' stroke-width='2'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #fbf7f0; --card: #ffffff; --ink: #1d1b16; --muted: #6b665c; --line: #e8e1d4;
-    --brand: #0f8a5f; --brand-ink: #ffffff; --accent: #f2a516; --wa: #25d366; --err: #b42318;
-    --radius: 16px; --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(29,27,22,.06);
+    --paper: #f3f0e8; --paper-2: #ebe7dc; --card: #fbfaf6; --ink: #111110; --ink-2: #3a3833;
+    --muted: #77736a; --line: rgba(17,17,16,.12); --line-strong: rgba(17,17,16,.85);
+    --danfo: #ffd23f; --danfo-ink: #1a1500; --ok: #1f7a4d; --err: #c0391b;
+    --r: 10px;
+    --display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
-  main { max-width: 980px; margin: 0 auto; padding: 20px 16px 64px; }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-  .logo { font-weight: 800; font-size: 22px; letter-spacing: -.02em; }
-  .logo span { color: var(--brand); }
-  .pill { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: #e9f5ef; color: var(--brand); border: 1px solid #cfe9dc; }
-  .pill.demo { background: #fff6e1; color: #8a5a00; border-color: #f4dfae; }
-  h1 { font-size: clamp(26px, 5vw, 38px); line-height: 1.15; letter-spacing: -.02em; margin: 8px 0 6px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
-  .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
-  @media (min-width: 860px) { .grid { grid-template-columns: 380px 1fr; align-items: start; } }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
-  .drop { display: grid; place-items: center; text-align: center; border: 2px dashed var(--line); border-radius: 12px; min-height: 220px; cursor: pointer; overflow: hidden; position: relative; background: #fdfbf7; }
-  .drop:hover, .drop.over { border-color: var(--brand); }
-  .drop img { width: 100%; height: 100%; max-height: 320px; object-fit: contain; display: block; }
-  .drop .hint { padding: 20px; color: var(--muted); }
-  .drop .hint b { color: var(--ink); display: block; font-size: 17px; margin-bottom: 4px; }
-  label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
-  input, textarea, select { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
-  input:focus, textarea:focus, select:focus { outline: 2px solid #bfe3d3; border-color: var(--brand); }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15.5px/1.55 var(--display); font-optical-sizing: auto; }
+  /* film grain over everything */
+  body::after {
+    content: ""; position: fixed; inset: -50%; pointer-events: none; z-index: 100; opacity: .14; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .icon { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .icon.sm { width: 15px; height: 15px; }
+  .icon.lg { width: 26px; height: 26px; stroke-width: 1.4; }
+  .mono { font-family: var(--mono); font-size: 11.5px; letter-spacing: .02em; text-transform: uppercase; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+  /* nav */
+  nav { border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -.03em; text-decoration: none; color: inherit; }
+  .brand .mark { width: 28px; height: 28px; border-radius: 7px; background: var(--ink); color: var(--danfo); display: grid; place-items: center; }
+  .brand .mark .icon { width: 16px; height: 16px; stroke-width: 2; }
+  .nav-meta { display: flex; align-items: center; gap: 18px; color: var(--muted); }
+  .nav-meta a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .nav-meta a:hover { color: var(--ink); }
+  .status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink-2); }
+  .status i { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(31,122,77,.15); }
+  .status.demo i { background: #c98a00; box-shadow: 0 0 0 3px rgba(201,138,0,.18); }
+  @media (max-width: 640px) { .nav-meta .hide-sm { display: none; } }
+
+  /* hero */
+  .hero { padding: 56px 0 28px; display: grid; gap: 28px; grid-template-columns: 1fr; align-items: end; }
+  @media (min-width: 900px) { .hero { grid-template-columns: 1.35fr 1fr; padding-top: 72px; } }
+  .eyebrow { color: var(--muted); display: flex; gap: 10px; align-items: center; margin-bottom: 18px; }
+  .eyebrow b { color: var(--ink); font-weight: 500; }
+  h1 { font-size: clamp(64px, 9vw, 112px); line-height: .9; letter-spacing: -.055em; font-weight: 800; margin: 0; font-variation-settings: "opsz" 96; }
+  h1 .soft { color: var(--muted); font-weight: 500; }
+  h1 .hl { position: relative; white-space: nowrap; }
+  h1 .hl::after { content: ""; position: absolute; left: -2%; right: -2%; bottom: .06em; height: .26em; background: var(--danfo); z-index: -1; transform: skewX(-8deg); }
+  .hero p { font-size: 18px; line-height: 1.5; color: var(--ink-2); margin: 0 0 18px; max-width: 42ch; }
+  .dither-strip { display: block; width: 100%; height: 56px; border-radius: 6px; image-rendering: pixelated; border: 1px solid var(--line); }
+  .ascii-row { margin-top: 10px; display: flex; justify-content: space-between; color: var(--muted); }
+
+  /* workspace */
+  .grid { display: grid; gap: 18px; grid-template-columns: 1fr; padding-bottom: 48px; }
+  @media (min-width: 900px) { .grid { grid-template-columns: 400px 1fr; align-items: start; } }
+  .left { display: grid; gap: 18px; }
+  @media (max-width: 899px) { .left { display: contents; } .in-card { order: 1; } #outCard { order: 2; } .cat-card { order: 3; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); }
+  .card-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--muted); }
+  .card-h .t { display: flex; align-items: center; gap: 8px; color: var(--ink); }
+  .card-b { padding: 16px; }
+
+  .drop { position: relative; display: grid; place-items: center; min-height: 240px; border-radius: 8px; cursor: pointer; overflow: hidden; border: 1px dashed rgba(17,17,16,.35); text-align: center;
+    background-color: var(--paper-2);
+    background-image: radial-gradient(rgba(17,17,16,.22) 1px, transparent 1.2px);
+    background-size: 6px 6px; }
+  .drop:hover, .drop:focus-visible, .drop.over { border-color: var(--ink); outline: none; }
+  .drop .hint { display: grid; justify-items: center; gap: 10px; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  .drop .hint b { font-size: 16px; font-weight: 600; }
+  .drop .hint .mono { color: var(--muted); }
+  .drop img { width: 100%; height: 100%; max-height: 340px; object-fit: contain; display: block; background: var(--paper-2); }
+  .drop canvas.scan { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; background: var(--paper-2); }
+  .drop .scanline { position: absolute; left: 0; right: 0; height: 2px; background: var(--danfo); box-shadow: 0 0 0 1px var(--ink); animation: scan 1.6s ease-in-out infinite alternate; }
+  @keyframes scan { from { top: 4%; } to { top: 95%; } }
+  .drop .scan-label { position: absolute; left: 10px; bottom: 10px; background: var(--ink); color: var(--paper); padding: 5px 8px; border-radius: 5px; }
+
+  label { display: block; margin: 16px 0 6px; color: var(--muted); }
+  input, textarea, select { width: 100%; font: inherit; font-size: 15px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); transition: border-color .15s; }
+  input::placeholder, textarea::placeholder { color: #a7a399; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(255,210,63,.55); }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  button { font: inherit; font-weight: 700; border: 0; border-radius: 12px; padding: 12px 16px; cursor: pointer; }
-  .primary { width: 100%; margin-top: 16px; background: var(--brand); color: var(--brand-ink); font-size: 16px; }
-  .primary:disabled { opacity: .6; cursor: progress; }
-  .ghost { background: #f3efe6; color: var(--ink); padding: 8px 12px; font-size: 13px; }
-  .wa { background: var(--wa); color: #0b3d22; padding: 8px 12px; font-size: 13px; text-decoration: none; border-radius: 12px; font-weight: 700; display: inline-block; }
-  .empty { color: var(--muted); text-align: center; padding: 48px 16px; }
-  .empty .big { font-size: 44px; }
-  .title-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; margin-bottom: 8px; }
-  .title-row h2 { margin: 0; font-size: 22px; }
-  .tag { font-size: 12px; padding: 3px 8px; border-radius: 6px; background: #f3efe6; color: var(--muted); }
-  .price { font-weight: 800; color: var(--brand); }
-  ul.points { margin: 8px 0 0; padding-left: 20px; }
-  .block { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
-  .block h3 { font-size: 14px; margin: 0 0 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .block h3 .actions { display: flex; gap: 6px; }
-  .text { white-space: pre-wrap; background: #fdfbf7; border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin: 0; }
-  .tip { background: #fff6e1; border: 1px solid #f4dfae; border-radius: 10px; padding: 10px 12px; }
-  .faq dt { font-weight: 700; margin-top: 8px; }
-  .faq dd { margin: 2px 0 0; color: var(--muted); }
-  .err { color: var(--err); margin-top: 10px; font-size: 14px; }
-  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.5); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -3px; margin-right: 8px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .field-ic { position: relative; }
+  .field-ic .icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); width: 16px; height: 16px; }
+  .field-ic input { padding-left: 34px; }
+
+  button, .btn { font: inherit; font-weight: 600; border: 1px solid transparent; border-radius: 8px; padding: 10px 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: transform .08s, background .15s, border-color .15s; white-space: nowrap; }
+  button:active, .btn:active { transform: translateY(1px); }
+  button:focus-visible, .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .primary { width: 100%; margin-top: 18px; background: var(--danfo); color: var(--danfo-ink); border-color: var(--ink); font-size: 16px; padding: 14px 16px; box-shadow: 3px 3px 0 var(--ink); }
+  .primary:hover { background: #ffcb1a; }
+  .primary:active { box-shadow: 1px 1px 0 var(--ink); transform: translate(2px, 2px); }
+  .primary:disabled { cursor: progress; background: var(--paper-2); }
+  .ghost { background: transparent; color: var(--ink); border-color: var(--line); padding: 7px 10px; font-size: 13.5px; font-weight: 500; }
+  .ghost:hover { border-color: var(--ink); }
+  .dark { background: var(--ink); color: var(--paper); padding: 7px 11px; font-size: 13.5px; font-weight: 500; }
+  .dark:hover { background: #2a2925; }
+  .save { background: var(--card); color: var(--ink); border-color: var(--ink); padding: 8px 12px; font-size: 13.5px; }
+  .save.on { background: var(--ink); color: var(--danfo); }
+
+  /* output */
+  .empty { display: grid; place-items: center; text-align: center; min-height: 420px; padding: 32px 16px; color: var(--muted); }
+  .empty pre { font-family: var(--mono); font-size: 12px; line-height: 1.25; color: var(--ink-2); margin: 0 0 18px; }
+  .empty p { margin: 0; max-width: 34ch; }
+  .head { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: start; padding: 20px 20px 4px; }
+  @media (max-width: 560px) { .head { grid-template-columns: 1fr; } .head .save { justify-self: start; } }
+  .head h2 { font-size: clamp(26px, 3.4vw, 36px); line-height: 1.02; letter-spacing: -.035em; margin: 0 0 10px; font-weight: 700; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .chip { padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); }
+  .chip.price { background: var(--ink); color: var(--danfo); border-color: var(--ink); font-size: 12.5px; }
+  .points { list-style: none; margin: 14px 20px 6px; padding: 0; display: grid; gap: 6px; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .points { grid-template-columns: 1fr 1fr; } }
+  .points li { display: flex; gap: 8px; align-items: flex-start; color: var(--ink-2); }
+  .points li .icon { margin-top: 3px; color: var(--ok); }
+  .block { border-top: 1px solid var(--line); padding: 16px 20px; }
+  .block-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .block-h .t { display: flex; align-items: center; gap: 9px; font-weight: 600; }
+  .block-h .t .n { color: var(--muted); font-weight: 400; }
+  .actions { display: flex; gap: 6px; }
+  .text { white-space: pre-wrap; margin: 0; padding: 14px; border-radius: 8px; background: #fff; border: 1px solid var(--line); font-size: 15.5px; line-height: 1.55; }
+  .tip { display: flex; gap: 10px; padding: 12px 14px; border-radius: 8px; background: #fff7d6; border: 1px solid #f0dc8c; }
+  .tip .icon { margin-top: 2px; }
+  .faq { margin: 0; display: grid; gap: 10px; }
+  .faq div { padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  .faq dt { font-weight: 600; }
+  .faq dd { margin: 2px 0 0; color: var(--ink-2); }
+  .reply-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 8px; }
   .reply-out { margin-top: 10px; }
-  .catalog h2 { font-size: 16px; margin: 0 0 4px; display: flex; justify-content: space-between; align-items: center; }
-  .catalog .count { font-size: 12px; color: var(--muted); font-weight: 600; }
-  .cat-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
-  .cat-item { display: grid; grid-template-columns: 48px 1fr auto; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; background: #fdfbf7; }
-  .cat-item:hover, .cat-item.active { border-color: var(--brand); }
-  .cat-item img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; background: #eee; }
-  .cat-item .name { font-weight: 700; font-size: 14px; line-height: 1.2; }
-  .cat-item .meta { font-size: 12px; color: var(--muted); }
-  .cat-item .del { background: none; padding: 4px 6px; color: var(--muted); font-size: 16px; }
-  .cat-empty { color: var(--muted); font-size: 14px; margin: 6px 0 0; }
-  .save { background: var(--accent); color: #3d2a00; padding: 8px 12px; font-size: 13px; }
-  .left { display: grid; gap: 16px; }
-  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 32px; }
+  .reply-out .actions { margin-top: 8px; }
+  .err { color: var(--err); margin-top: 10px; font-size: 14px; display: flex; gap: 6px; align-items: center; }
+  .err:empty { display: none; }
+  .ascii-spin { font-family: var(--mono); display: inline-block; width: 1ch; }
+
+  /* catalog */
+  .cat-list { list-style: none; margin: 0; padding: 0; }
+  .cat-item { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 10px 16px; border-top: 1px solid var(--line); cursor: pointer; transition: background .12s; }
+  .cat-item:first-child { border-top: 0; }
+  .cat-item:hover { background: var(--paper); }
+  .cat-item.active { background: #fff7d6; }
+  .cat-item img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); filter: grayscale(.15) contrast(1.05); }
+  .cat-item .name { font-weight: 600; font-size: 14.5px; line-height: 1.2; }
+  .cat-item .meta { color: var(--muted); margin-top: 3px; }
+  .cat-item .del { background: none; border: 0; padding: 6px; color: var(--muted); border-radius: 6px; }
+  .cat-item .del:hover { color: var(--ink); background: var(--paper-2); }
+  .cat-empty { padding: 16px; color: var(--muted); font-size: 14px; display: flex; gap: 10px; }
+  .cat-empty .icon { margin-top: 2px; }
+
+  footer { border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; padding-top: 18px; padding-bottom: 28px; color: var(--muted); }
   footer a { color: inherit; }
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
-  .toast.show { opacity: 1; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 8px); background: var(--ink); color: var(--paper); padding: 10px 14px; border-radius: 8px; font-size: 14px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; display: flex; gap: 8px; align-items: center; z-index: 101; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  @media (prefers-reduced-motion: reduce) { .drop .scanline { animation: none; top: 50%; } * { transition: none !important; } }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <div class="logo">Oja<span>Snap</span> 🛍️</div>
-    <span id="modelPill" class="pill">checking model…</span>
-  </header>
+<!-- Icon sprite (line icons, 24px grid) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1.3 11.1A2 2 0 0 1 15.7 21H8.3a2 2 0 0 1-2-1.9z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7.5 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3.5z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5z"/></symbol>
+  <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+  <symbol id="i-lang" viewBox="0 0 24 24"><path d="M4 5h8"/><path d="M8 3v2"/><path d="M5.5 5c.8 3.6 3.2 6.4 6.5 8"/><path d="M10.5 5c-.8 3.6-3.2 6.4-6.5 8"/><path d="M13 21l4-10 4 10"/><path d="M14.5 17h5"/></symbol>
+  <symbol id="i-voice" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v3"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.4-2.5 2.4"/><path d="M12 16.5h.01"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-naira" viewBox="0 0 24 24"><path d="M7 20V4l10 16V4"/><path d="M4 10h16"/><path d="M4 14h16"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></symbol>
+</svg>
 
-  <h1>Snap it. Post it. Sell it.</h1>
-  <p class="sub">Take a photo of what you're selling. Gemma 4 writes your WhatsApp Status, Instagram caption, Pidgin and Yoruba versions, keeps your catalog, and helps you answer customers' DMs.</p>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="/"><span class="mark"><svg class="icon"><use href="#i-bag"/></svg></span>OjaSnap</a>
+    <div class="nav-meta">
+      <a class="mono hide-sm" href="https://github.com/ALIPHATICHYD/ojasnap" target="_blank" rel="noopener"><svg class="icon sm"><use href="#i-github"/></svg>Source</a>
+      <span id="modelPill" class="status mono"><i></i><span>checking…</span></span>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow mono"><b>Oja</b> = market (Yoruba) <span>/</span> Built for Lagos sellers</div>
+      <h1>Snap it.<br><span class="soft">Post it.</span><br><span class="hl">Sell it.</span></h1>
+    </div>
+    <div>
+      <p>Take one photo of what you're selling. Gemma 4 writes your WhatsApp Status, Instagram caption, Pidgin and Yoruba versions, keeps your catalog, and helps you answer every “how much last price?”.</p>
+      <canvas id="dither" class="dither-strip" width="240" height="28" aria-hidden="true"></canvas>
+      <div class="ascii-row mono" aria-hidden="true"><span>[ photo ]──►[ gemma 4 ]──►[ post ]</span><span>₦</span></div>
+    </div>
+  </section>
 
   <div class="grid">
     <div class="left">
-    <!-- Input -->
-    <section class="card" aria-label="Your product">
-      <div id="drop" class="drop" tabindex="0" role="button" aria-label="Add a product photo">
-        <div class="hint" id="dropHint"><b>📸 Tap to snap or upload</b>or drag a photo here</div>
-      </div>
-      <input id="file" type="file" accept="image/*" capture="environment" hidden />
+      <!-- Input -->
+      <section class="card in-card" aria-label="Your product">
+        <div class="card-h mono"><span class="t"><svg class="icon sm"><use href="#i-camera"/></svg>01 — Your product</span><span>jpg · png · heic</span></div>
+        <div class="card-b">
+          <div id="drop" class="drop" tabindex="0" role="button" aria-label="Add a product photo">
+            <div class="hint" id="dropHint">
+              <svg class="icon lg"><use href="#i-camera"/></svg>
+              <b>Tap to snap or upload</b>
+              <span class="mono">or drag a photo here</span>
+            </div>
+          </div>
+          <input id="file" type="file" accept="image/*" capture="environment" hidden />
 
-      <div class="row">
-        <div>
-          <label for="price">Price (₦)</label>
-          <input id="price" inputmode="numeric" placeholder="e.g. 8,500" />
+          <div class="row">
+            <div>
+              <label for="price" class="mono">Price</label>
+              <div class="field-ic"><svg class="icon"><use href="#i-naira"/></svg><input id="price" inputmode="numeric" placeholder="8,500" /></div>
+            </div>
+            <div>
+              <label for="location" class="mono">Location</label>
+              <div class="field-ic"><svg class="icon"><use href="#i-pin"/></svg><input id="location" placeholder="Yaba, Unilag" /></div>
+            </div>
+          </div>
+          <label for="seller" class="mono">Shop name · optional</label>
+          <div class="field-ic"><svg class="icon"><use href="#i-store"/></svg><input id="seller" placeholder="Tola's Thrift" /></div>
+          <label for="notes" class="mono">What Gemma can't see · optional</label>
+          <textarea id="notes" rows="2" placeholder="Size 42, two colours, free delivery in Akoka"></textarea>
+
+          <button id="go" class="primary"><svg class="icon"><use href="#i-sparkle"/></svg><span>Write my listing</span></button>
+          <div id="err" class="err" role="alert"></div>
         </div>
-        <div>
-          <label for="location">Location</label>
-          <input id="location" placeholder="e.g. Yaba, Unilag" />
-        </div>
-      </div>
-      <label for="seller">Shop name (optional)</label>
-      <input id="seller" placeholder="e.g. Tola's Thrift" />
-      <label for="notes">Anything Gemma can't see? (optional)</label>
-      <textarea id="notes" rows="2" placeholder="e.g. size 42, 2 colours available, free delivery in Akoka"></textarea>
+      </section>
 
-      <button id="go" class="primary">✨ Write my listing</button>
-      <div id="err" class="err" role="alert"></div>
-    </section>
-
-    <!-- Catalog -->
-    <section class="card catalog" aria-label="My catalog">
-      <h2>🗂️ My catalog <span class="count" id="catCount"></span></h2>
-      <div class="cat-empty" id="catEmpty">Save listings here. They stay on this phone, and Gemma uses your prices when it drafts replies to customers.</div>
-      <ul class="cat-list" id="catList"></ul>
-    </section>
+      <!-- Catalog -->
+      <section class="card cat-card" aria-label="My catalog">
+        <div class="card-h mono"><span class="t"><svg class="icon sm"><use href="#i-grid"/></svg>03 — My catalog</span><span id="catCount"></span></div>
+        <div class="cat-empty" id="catEmpty"><svg class="icon"><use href="#i-grid"/></svg><span>Saved listings live on this phone. Gemma uses their prices when it drafts replies to customers.</span></div>
+        <ul class="cat-list" id="catList"></ul>
+      </section>
     </div>
 
     <!-- Output -->
-    <section class="card" id="out" aria-live="polite">
-      <div class="empty"><div class="big">🧺</div>Your ready-to-post listing will show up here.</div>
+    <section class="card" id="outCard" aria-label="Your listing">
+      <div class="card-h mono"><span class="t"><svg class="icon sm"><use href="#i-sparkle"/></svg>02 — Ready to post</span><span id="outMeta">waiting for a photo</span></div>
+      <div id="out" aria-live="polite">
+        <div class="empty">
+<pre aria-hidden="true">+----------------------+
+|  .----.              |
+|  | ## |  ~~~~~~~~~~  |
+|  '----'  ~~~~~~      |
+|          ₦ ------    |
++----------------------+
+  photo  ->  listing</pre>
+          <p>Your ready-to-post listing shows up here: captions in three languages, buyer FAQs and a reply helper.</p>
+        </div>
+      </div>
     </section>
   </div>
-
-  <footer>Open source (MIT) · Built with <b>Gemma 4</b> via the Gemini API · <a href="https://github.com/ALIPHATICHYD/ojasnap">GitHub</a></footer>
 </main>
-<div id="toast" class="toast"></div>
+
+<footer>
+  <div class="wrap mono">
+    <span>Open source · MIT</span>
+    <span>Gemma 4 via the Gemini API</span>
+    <a href="https://github.com/ALIPHATICHYD/ojasnap" target="_blank" rel="noopener">github.com/ALIPHATICHYD/ojasnap</a>
+  </div>
+</footer>
+<div id="toast" class="toast" role="status"></div>
 
 <script>
 const $ = (id) => document.getElementById(id);
+const ic = (name, cls = "") => `<svg class="icon ${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
 let photo = null;   // { data, mimeType }
+let photoCanvas = null;
 let listing = null;
 let thumb = null;   // small data URL for catalog
 let activeId = null;
@@ -143,9 +299,30 @@ const saveCatalog = (c) => localStorage.setItem(CAT_KEY, JSON.stringify(c));
 
 fetch("/api/health").then(r => r.json()).then(h => {
   const pill = $("modelPill");
-  pill.textContent = h.demo ? "Demo mode (no API key)" : "Gemma 4 · " + h.model;
+  pill.querySelector("span").textContent = h.demo ? "Demo mode" : "Gemma 4 · live";
+  pill.title = h.demo ? "No GEMINI_API_KEY set; showing sample output" : h.model;
   if (h.demo) pill.classList.add("demo");
-}).catch(() => { $("modelPill").textContent = "offline"; });
+}).catch(() => { $("modelPill").querySelector("span").textContent = "offline"; });
+
+// ---- ordered (Bayer) dithering ----
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16);
+function ditherInto(ctx, w, h, lumAt, ink = [17, 17, 16], paper = [235, 231, 220], accent = null) {
+  const img = ctx.createImageData(w, h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = (y * w + x) * 4, l = lumAt(x, y), on = l < BAYER[(y % 4) * 4 + (x % 4)];
+    const c = on ? ink : (accent && accent.test(x, y, l) ? accent.color : paper);
+    img.data[i] = c[0]; img.data[i + 1] = c[1]; img.data[i + 2] = c[2]; img.data[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+// Decorative hero strip: a dithered gradient with a danfo-yellow band.
+(() => {
+  const c = $("dither"), ctx = c.getContext("2d");
+  ditherInto(ctx, c.width, c.height,
+    (x, y) => Math.min(1, Math.max(0, (x / c.width) * 1.1 + Math.sin(y / 4 + x / 30) * .08)),
+    undefined, undefined,
+    { test: (x) => x > c.width * .62 && x < c.width * .78, color: [255, 210, 63] });
+})();
 
 // ---- photo input ----
 const drop = $("drop"), file = $("file");
@@ -165,6 +342,7 @@ function loadPhoto(f) {
     const c = document.createElement("canvas");
     c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
     c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    photoCanvas = c;
     const url = c.toDataURL("image/jpeg", 0.85);
     photo = { data: url.split(",")[1], mimeType: "image/jpeg" };
     const t = document.createElement("canvas"), ts = 120 / Math.max(c.width, c.height);
@@ -179,11 +357,40 @@ function loadPhoto(f) {
   img.src = URL.createObjectURL(f);
 }
 
+// While Gemma looks at the photo: show it dithered with a scan line.
+function startScan() {
+  if (!photoCanvas) return () => {};
+  const w = 200, h = Math.max(1, Math.round(photoCanvas.height * (200 / photoCanvas.width)));
+  const small = document.createElement("canvas"); small.width = w; small.height = h;
+  const sctx = small.getContext("2d"); sctx.drawImage(photoCanvas, 0, 0, w, h);
+  const px = sctx.getImageData(0, 0, w, h).data;
+  const out = document.createElement("canvas"); out.width = w; out.height = h; out.className = "scan";
+  ditherInto(out.getContext("2d"), w, h, (x, y) => {
+    const i = (y * w + x) * 4; return (0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]) / 255;
+  });
+  const line = document.createElement("div"); line.className = "scanline";
+  const label = document.createElement("div"); label.className = "scan-label mono"; label.textContent = "gemma 4 is reading the photo";
+  drop.append(out, line, label);
+  return () => { out.remove(); line.remove(); label.remove(); };
+}
+
+function asciiSpinner(el, text) {
+  const frames = ["|", "/", "-", "\\"]; let i = 0;
+  el.innerHTML = `<span class="ascii-spin">|</span><span>${text}</span>`;
+  const s = el.querySelector(".ascii-spin");
+  const t = setInterval(() => { s.textContent = frames[++i % 4]; }, 110);
+  return () => clearInterval(t);
+}
+
 // ---- generate listing ----
+const GO_LABEL = `${ic("sparkle")}<span>Write my listing</span>`;
 $("go").addEventListener("click", async () => {
-  if (!photo) return showErr("Add a product photo first 📸");
+  if (!photo) return showErr("Add a product photo first.");
   const btn = $("go");
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Gemma is looking at your photo…';
+  btn.disabled = true;
+  const stopSpin = asciiSpinner(btn, "Reading your photo…");
+  const stopScan = startScan();
+  $("outMeta").textContent = "working…";
   showErr("");
   try {
     const priceRaw = $("price").value.trim();
@@ -201,8 +408,9 @@ $("go").addEventListener("click", async () => {
     listing._price = naira(priceRaw);
     activeId = null;
     render(listing);
-  } catch (e) { showErr(e.message); }
-  finally { btn.disabled = false; btn.textContent = "✨ Write my listing"; }
+    if (window.innerWidth < 900) $("outCard").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (e) { showErr(e.message); $("outMeta").textContent = "something went wrong"; }
+  finally { stopSpin(); stopScan(); btn.disabled = false; btn.innerHTML = GO_LABEL; }
 });
 
 // "8500" -> "₦8,500"; leaves free text like "₦5k - ₦7k" alone.
@@ -215,39 +423,50 @@ function naira(raw) {
 function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
 const wa = (t) => "https://wa.me/?text=" + encodeURIComponent(t);
 
-function textBlock(title, key, text, withWa) {
-  return `<div class="block"><h3>${title}<span class="actions">
-    <button class="ghost" data-copy="${key}">Copy</button>
-    ${withWa ? `<a class="wa" target="_blank" rel="noopener" href="${wa(text)}">Send on WhatsApp</a>` : ""}
-  </span></h3><p class="text" id="t-${key}">${esc(text)}</p></div>`;
+function textBlock(n, icon, title, key, text, withWa) {
+  return `<div class="block">
+    <div class="block-h">
+      <span class="t">${ic(icon)}${title}<span class="n mono">${n}</span></span>
+      <span class="actions">
+        <button class="ghost" data-copy="${key}">${ic("copy", "sm")}Copy</button>
+        ${withWa ? `<a class="btn dark" target="_blank" rel="noopener" href="${wa(text)}">${ic("send", "sm")}WhatsApp</a>` : ""}
+      </span>
+    </div>
+    <p class="text" id="t-${key}">${esc(text)}</p>
+  </div>`;
 }
 
 function render(l) {
-  const faq = (l.faq || []).map(f => `<dt>${esc(f.q)}</dt><dd>${esc(f.a)}</dd>`).join("");
+  const faq = (l.faq || []).map(f => `<div><dt>${esc(f.q)}</dt><dd>${esc(f.a)}</dd></div>`).join("");
+  $("outMeta").textContent = activeId ? "from your catalog" : "fresh from gemma 4";
   $("out").innerHTML = `
-    <div class="title-row">
-      <h2>${esc(l.product_name)}</h2>
-      <span class="tag">${esc(l.category)}</span><span class="tag">${esc(l.condition)}</span>
-      <span class="price">${esc(l._price || l.price_hint)}</span>
-      <button class="save" id="saveBtn" style="margin-left:auto">${activeId ? "✓ In catalog" : "＋ Save to catalog"}</button>
+    <div class="head">
+      <div>
+        <h2>${esc(l.product_name)}</h2>
+        <div class="chips mono">
+          <span class="chip price">${esc(l._price || l.price_hint)}</span>
+          <span class="chip">${esc(l.category)}</span><span class="chip">${esc(l.condition)}</span>
+        </div>
+      </div>
+      <button class="save ${activeId ? "on" : ""}" id="saveBtn">${activeId ? ic("check", "sm") + "Saved" : ic("plus", "sm") + "Save to catalog"}</button>
     </div>
-    <ul class="points">${(l.selling_points || []).map(p => `<li>${esc(p)}</li>`).join("")}</ul>
-    ${textBlock("💬 WhatsApp Status", "wa", l.whatsapp_status, true)}
-    ${textBlock("📷 Instagram caption", "ig", l.instagram_caption, false)}
-    ${textBlock("🇳🇬 Pidgin version", "pg", l.pidgin_caption, true)}
-    ${l.yoruba_caption ? textBlock("🗣️ Yoruba version", "yo", l.yoruba_caption, true) : ""}
-    <div class="block"><h3>💡 Photo tip</h3><div class="tip">${esc(l.photo_tip)}</div></div>
-    ${faq ? `<div class="block"><h3>❓ Buyers will ask</h3><dl class="faq">${faq}</dl></div>` : ""}
+    <ul class="points">${(l.selling_points || []).map(p => `<li>${ic("check", "sm")}<span>${esc(p)}</span></li>`).join("")}</ul>
+    ${textBlock("EN", "chat", "WhatsApp Status", "wa", l.whatsapp_status, true)}
+    ${textBlock("EN", "insta", "Instagram caption", "ig", l.instagram_caption, false)}
+    ${textBlock("PCM", "lang", "Pidgin version", "pg", l.pidgin_caption, true)}
+    ${l.yoruba_caption ? textBlock("YO", "voice", "Yoruba version", "yo", l.yoruba_caption, true) : ""}
+    <div class="block"><div class="block-h"><span class="t">${ic("bulb")}Photo tip</span></div><div class="tip"><span>${esc(l.photo_tip)}</span></div></div>
+    ${faq ? `<div class="block"><div class="block-h"><span class="t">${ic("help")}Buyers will ask</span></div><dl class="faq">${faq}</dl></div>` : ""}
     <div class="block">
-      <h3>📥 Reply to a customer</h3>
+      <div class="block-h"><span class="t">${ic("inbox")}Reply to a customer</span><span class="mono" style="color:var(--muted)">matches their language</span></div>
       <textarea id="dm" rows="2" placeholder='Paste their DM, e.g. "Abeg how much last price? I dey Akoka"'></textarea>
-      <div class="row" style="margin-top:8px">
+      <div class="reply-row">
         <select id="tone" aria-label="Reply tone">
           <option value="friendly and professional">Friendly</option>
           <option value="warm, playful and very Lagos">Playful</option>
           <option value="short and formal">Formal</option>
         </select>
-        <button id="replyBtn" class="ghost" style="padding:10px">Draft reply</button>
+        <button id="replyBtn" class="dark">${ic("arrow", "sm")}Draft reply</button>
       </div>
       <div id="replyOut" class="reply-out"></div>
     </div>`;
@@ -263,23 +482,23 @@ function saveToCatalog() {
   activeId = String(Date.now());
   cat.unshift({ id: activeId, thumb, price: listing._price || listing.price_hint, listing });
   try { saveCatalog(cat.slice(0, 60)); } catch { activeId = null; return toast("Phone storage is full"); }
-  $("saveBtn").textContent = "✓ In catalog";
-  renderCatalog(); toast("Saved to catalog 🗂️");
+  const b = $("saveBtn"); b.classList.add("on"); b.innerHTML = ic("check", "sm") + "Saved";
+  renderCatalog(); toast("Saved to catalog");
 }
 
 function renderCatalog() {
   const cat = loadCatalog();
-  $("catCount").textContent = cat.length ? `${cat.length} item${cat.length > 1 ? "s" : ""}` : "";
-  $("catEmpty").style.display = cat.length ? "none" : "block";
+  $("catCount").textContent = cat.length ? `${cat.length} item${cat.length > 1 ? "s" : ""}` : "empty";
+  $("catEmpty").style.display = cat.length ? "none" : "flex";
   $("catList").innerHTML = cat.map(c => `
     <li class="cat-item ${c.id === activeId ? "active" : ""}" data-id="${c.id}">
       ${c.thumb ? `<img alt="" src="${c.thumb}">` : "<span></span>"}
-      <div><div class="name">${esc(c.listing.product_name)}</div><div class="meta">${esc(c.price)} · ${esc(c.listing.category)}</div></div>
-      <button class="del" data-del="${c.id}" aria-label="Remove ${esc(c.listing.product_name)}">✕</button>
+      <div><div class="name">${esc(c.listing.product_name)}</div><div class="meta mono">${esc(c.price)} · ${esc(c.listing.category)}</div></div>
+      <button class="del" data-del="${c.id}" aria-label="Remove ${esc(c.listing.product_name)}">${ic("x", "sm")}</button>
     </li>`).join("");
   $("catList").querySelectorAll(".cat-item").forEach(li => li.addEventListener("click", (e) => {
     const id = li.dataset.id;
-    if (e.target.dataset.del) {
+    if (e.target.closest("[data-del]")) {
       saveCatalog(loadCatalog().filter(c => c.id !== id));
       if (activeId === id) activeId = null;
       return renderCatalog();
@@ -288,7 +507,7 @@ function renderCatalog() {
     if (!item) return;
     listing = item.listing; activeId = id;
     render(listing); renderCatalog();
-    $("out").scrollIntoView({ behavior: "smooth", block: "start" });
+    $("outCard").scrollIntoView({ behavior: "smooth", block: "start" });
   }));
 }
 renderCatalog();
@@ -296,7 +515,8 @@ renderCatalog();
 async function draftReply() {
   const message = $("dm").value.trim();
   if (!message) return toast("Paste the customer's message first");
-  const btn = $("replyBtn"); btn.disabled = true; btn.textContent = "Drafting…";
+  const btn = $("replyBtn"); btn.disabled = true;
+  const stopSpin = asciiSpinner(btn, "Drafting…");
   try {
     const res = await fetch("/api/reply", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -308,18 +528,19 @@ async function draftReply() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Request failed");
     $("replyOut").innerHTML = `<p class="text" id="t-reply">${esc(data.reply)}</p>
-      <div style="display:flex;gap:6px;margin-top:8px">
-        <button class="ghost" id="copyReply">Copy</button>
-        <a class="wa" target="_blank" rel="noopener" href="${wa(data.reply)}">Send on WhatsApp</a>
+      <div class="actions">
+        <button class="ghost" id="copyReply">${ic("copy", "sm")}Copy</button>
+        <a class="btn dark" target="_blank" rel="noopener" href="${wa(data.reply)}">${ic("send", "sm")}Send on WhatsApp</a>
       </div>`;
     $("copyReply").addEventListener("click", () => copy(data.reply));
-  } catch (e) { $("replyOut").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
-  finally { btn.disabled = false; btn.textContent = "Draft reply"; }
+  } catch (e) { $("replyOut").innerHTML = `<div class="err">${ic("alert", "sm")}${esc(e.message)}</div>`; }
+  finally { stopSpin(); btn.disabled = false; btn.innerHTML = `${ic("arrow", "sm")}Draft reply`; }
 }
 
-function copy(t) { navigator.clipboard.writeText(t).then(() => toast("Copied ✅"), () => toast("Couldn't copy")); }
-function toast(msg) { const el = $("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 1600); }
-function showErr(m) { $("err").textContent = m; }
+function copy(t) { navigator.clipboard.writeText(t).then(() => toast("Copied"), () => toast("Couldn't copy")); }
+let toastT;
+function toast(msg) { const el = $("toast"); el.innerHTML = ic("check", "sm") + esc(msg); el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 1600); }
+function showErr(m) { $("err").innerHTML = m ? ic("alert", "sm") + esc(m) : ""; }
 </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-# OjaSnap 🛍️
+# OjaSnap
 
 **Snap it. Post it. Sell it.** Take a photo of what you're selling and **Gemma 4** writes a listing you can post right away: a WhatsApp Status, an Instagram caption with Lagos hashtags, and natural **Nigerian Pidgin** and **Yoruba** versions. It keeps your **catalog** on your phone and drafts replies to customers' DMs ("abeg how much last price?") using your real prices.
 
