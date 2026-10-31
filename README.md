@@ -35,9 +35,9 @@ This returns a sample listing so you can click through the whole flow. The badge
 **Then try this:**
 
 1. Tap **"Tap to snap or upload"** and pick any product photo (shoes, a bag, food, a phone, a book).
-2. Optionally type a price (e.g. `8500`) and a location (e.g. `Yaba`), then press **✨ Write my listing**.
+2. Optionally type a price (e.g. `8500`) and a location (e.g. `Yaba`), then press **Write my listing**.
 3. You'll get a product name, selling points, a WhatsApp Status, an Instagram caption, a Pidgin caption, a photo tip, and buyer FAQs. Press **Copy** or **Send on WhatsApp** on any of them.
-4. Scroll to **📥 Reply to a customer**, paste `Abeg how much last price? I dey Akoka`, and press **Draft reply**. Gemma answers in Pidgin, stays polite, and doesn't invent a new price.
+4. Scroll to **Reply to a customer**, paste `Abeg how much last price? I dey Akoka`, and press **Draft reply**. Gemma answers in Pidgin, stays polite, and doesn't invent a new price.
 
 Run the tests with `npm test`.
 
@@ -57,11 +57,11 @@ It's slow, repetitive, and a weak caption costs sales.
 
 | Step | What Gemma 4 does |
 |---|---|
-| 📸 Photo in | Looks at the image (multimodal) to work out what the product is, its condition and its visible selling points |
-| ✍️ Listing out | Writes a WhatsApp Status, Instagram caption + hashtags, Pidgin caption, and a price hint |
-| 💡 Coaching | Gives one concrete tip to make the photo sell better |
-| ❓ Buyer FAQ | Predicts the questions buyers will ask, with ready answers |
-| 📥 DM replies | Drafts a polite reply to a customer's message, matches their language (Pidgin or English), and never invents a price |
+| Photo in | Looks at the image (multimodal) to work out what the product is, its condition and its visible selling points |
+| Listing out | Writes a WhatsApp Status, Instagram caption + hashtags, Pidgin caption, and a price hint |
+| Coaching | Gives one concrete tip to make the photo sell better |
+| Buyer FAQ | Predicts the questions buyers will ask, with ready answers |
+| DM replies | Drafts a polite reply to a customer's message, matches their language (Pidgin or English), and never invents a price |
 
 Guardrails in the prompt: Gemma describes only what it can see plus the seller's notes, uses the seller's price exactly, and marks any price guess as an "estimate".
 
