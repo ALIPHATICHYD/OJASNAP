@@ -57,6 +57,18 @@
   .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.5); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -3px; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .reply-out { margin-top: 10px; }
+  .catalog h2 { font-size: 16px; margin: 0 0 4px; display: flex; justify-content: space-between; align-items: center; }
+  .catalog .count { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .cat-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+  .cat-item { display: grid; grid-template-columns: 48px 1fr auto; gap: 10px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; background: #fdfbf7; }
+  .cat-item:hover, .cat-item.active { border-color: var(--brand); }
+  .cat-item img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; background: #eee; }
+  .cat-item .name { font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .cat-item .meta { font-size: 12px; color: var(--muted); }
+  .cat-item .del { background: none; padding: 4px 6px; color: var(--muted); font-size: 16px; }
+  .cat-empty { color: var(--muted); font-size: 14px; margin: 6px 0 0; }
+  .save { background: var(--accent); color: #3d2a00; padding: 8px 12px; font-size: 13px; }
+  .left { display: grid; gap: 16px; }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 32px; }
   footer a { color: inherit; }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
@@ -71,9 +83,10 @@
   </header>
 
   <h1>Snap it. Post it. Sell it.</h1>
-  <p class="sub">Take a photo of what you're selling. Gemma 4 writes your WhatsApp Status, Instagram caption and Pidgin version, then helps you answer customers' DMs.</p>
+  <p class="sub">Take a photo of what you're selling. Gemma 4 writes your WhatsApp Status, Instagram caption, Pidgin and Yoruba versions, keeps your catalog, and helps you answer customers' DMs.</p>
 
   <div class="grid">
+    <div class="left">
     <!-- Input -->
     <section class="card" aria-label="Your product">
       <div id="drop" class="drop" tabindex="0" role="button" aria-label="Add a product photo">
@@ -100,6 +113,14 @@
       <div id="err" class="err" role="alert"></div>
     </section>
 
+    <!-- Catalog -->
+    <section class="card catalog" aria-label="My catalog">
+      <h2>🗂️ My catalog <span class="count" id="catCount"></span></h2>
+      <div class="cat-empty" id="catEmpty">Save listings here. They stay on this phone, and Gemma uses your prices when it drafts replies to customers.</div>
+      <ul class="cat-list" id="catList"></ul>
+    </section>
+    </div>
+
     <!-- Output -->
     <section class="card" id="out" aria-live="polite">
       <div class="empty"><div class="big">🧺</div>Your ready-to-post listing will show up here.</div>
@@ -114,6 +135,11 @@
 const $ = (id) => document.getElementById(id);
 let photo = null;   // { data, mimeType }
 let listing = null;
+let thumb = null;   // small data URL for catalog
+let activeId = null;
+const CAT_KEY = "ojasnap.catalog.v1";
+const loadCatalog = () => { try { return JSON.parse(localStorage.getItem(CAT_KEY)) || []; } catch { return []; } };
+const saveCatalog = (c) => localStorage.setItem(CAT_KEY, JSON.stringify(c));
 
 fetch("/api/health").then(r => r.json()).then(h => {
   const pill = $("modelPill");
@@ -141,6 +167,10 @@ function loadPhoto(f) {
     c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
     const url = c.toDataURL("image/jpeg", 0.85);
     photo = { data: url.split(",")[1], mimeType: "image/jpeg" };
+    const t = document.createElement("canvas"), ts = 120 / Math.max(c.width, c.height);
+    t.width = Math.round(c.width * ts); t.height = Math.round(c.height * ts);
+    t.getContext("2d").drawImage(c, 0, 0, t.width, t.height);
+    thumb = t.toDataURL("image/jpeg", 0.7);
     drop.innerHTML = `<img alt="Your product photo" src="${url}">`;
     showErr("");
     URL.revokeObjectURL(img.src);
@@ -161,18 +191,27 @@ $("go").addEventListener("click", async () => {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         image: photo.data, mimeType: photo.mimeType,
-        price: priceRaw ? (priceRaw.startsWith("₦") ? priceRaw : "₦" + priceRaw) : "",
+        price: naira(priceRaw),
         location: $("location").value.trim(), seller: $("seller").value.trim(), notes: $("notes").value.trim(),
       }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Request failed");
     listing = data.listing;
+    listing._price = naira(priceRaw);
+    activeId = null;
     render(listing);
   } catch (e) { showErr(e.message); }
   finally { btn.disabled = false; btn.textContent = "✨ Write my listing"; }
 });
 
+// "8500" -> "₦8,500"; leaves free text like "₦5k - ₦7k" alone.
+function naira(raw) {
+  if (!raw) return "";
+  const digits = raw.replace(/[₦,\s]/g, "");
+  if (/^\d+$/.test(digits)) return "₦" + Number(digits).toLocaleString("en-NG");
+  return raw.startsWith("₦") ? raw : "₦" + raw;
+}
 function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
 const wa = (t) => "https://wa.me/?text=" + encodeURIComponent(t);
 
@@ -189,12 +228,14 @@ function render(l) {
     <div class="title-row">
       <h2>${esc(l.product_name)}</h2>
       <span class="tag">${esc(l.category)}</span><span class="tag">${esc(l.condition)}</span>
-      <span class="price">${esc(l.price_hint)}</span>
+      <span class="price">${esc(l._price || l.price_hint)}</span>
+      <button class="save" id="saveBtn" style="margin-left:auto">${activeId ? "✓ In catalog" : "＋ Save to catalog"}</button>
     </div>
     <ul class="points">${(l.selling_points || []).map(p => `<li>${esc(p)}</li>`).join("")}</ul>
     ${textBlock("💬 WhatsApp Status", "wa", l.whatsapp_status, true)}
     ${textBlock("📷 Instagram caption", "ig", l.instagram_caption, false)}
     ${textBlock("🇳🇬 Pidgin version", "pg", l.pidgin_caption, true)}
+    ${l.yoruba_caption ? textBlock("🗣️ Yoruba version", "yo", l.yoruba_caption, true) : ""}
     <div class="block"><h3>💡 Photo tip</h3><div class="tip">${esc(l.photo_tip)}</div></div>
     ${faq ? `<div class="block"><h3>❓ Buyers will ask</h3><dl class="faq">${faq}</dl></div>` : ""}
     <div class="block">
@@ -213,7 +254,44 @@ function render(l) {
 
   $("out").querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => copy($("t-" + b.dataset.copy).textContent)));
   $("replyBtn").addEventListener("click", draftReply);
+  $("saveBtn").addEventListener("click", saveToCatalog);
 }
+
+function saveToCatalog() {
+  if (activeId) return toast("Already in your catalog");
+  const cat = loadCatalog();
+  activeId = String(Date.now());
+  cat.unshift({ id: activeId, thumb, price: listing._price || listing.price_hint, listing });
+  try { saveCatalog(cat.slice(0, 60)); } catch { activeId = null; return toast("Phone storage is full"); }
+  $("saveBtn").textContent = "✓ In catalog";
+  renderCatalog(); toast("Saved to catalog 🗂️");
+}
+
+function renderCatalog() {
+  const cat = loadCatalog();
+  $("catCount").textContent = cat.length ? `${cat.length} item${cat.length > 1 ? "s" : ""}` : "";
+  $("catEmpty").style.display = cat.length ? "none" : "block";
+  $("catList").innerHTML = cat.map(c => `
+    <li class="cat-item ${c.id === activeId ? "active" : ""}" data-id="${c.id}">
+      ${c.thumb ? `<img alt="" src="${c.thumb}">` : "<span></span>"}
+      <div><div class="name">${esc(c.listing.product_name)}</div><div class="meta">${esc(c.price)} · ${esc(c.listing.category)}</div></div>
+      <button class="del" data-del="${c.id}" aria-label="Remove ${esc(c.listing.product_name)}">✕</button>
+    </li>`).join("");
+  $("catList").querySelectorAll(".cat-item").forEach(li => li.addEventListener("click", (e) => {
+    const id = li.dataset.id;
+    if (e.target.dataset.del) {
+      saveCatalog(loadCatalog().filter(c => c.id !== id));
+      if (activeId === id) activeId = null;
+      return renderCatalog();
+    }
+    const item = loadCatalog().find(c => c.id === id);
+    if (!item) return;
+    listing = item.listing; activeId = id;
+    render(listing); renderCatalog();
+    $("out").scrollIntoView({ behavior: "smooth", block: "start" });
+  }));
+}
+renderCatalog();
 
 async function draftReply() {
   const message = $("dm").value.trim();
@@ -222,7 +300,10 @@ async function draftReply() {
   try {
     const res = await fetch("/api/reply", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ listing, message, tone: $("tone").value }),
+      body: JSON.stringify({
+        listing, message, tone: $("tone").value,
+        catalog: loadCatalog().map(c => ({ product_name: c.listing.product_name, price: c.price, condition: c.listing.condition })),
+      }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Request failed");

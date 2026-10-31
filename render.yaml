@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ojasnap
+    runtime: node
+    plan: free
+    buildCommand: "true"
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMMA_MODEL
+        value: gemma-4-26b-a4b-it

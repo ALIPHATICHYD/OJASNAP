@@ -1,12 +1,16 @@
 # OjaSnap 🛍️
 
-**Snap it. Post it. Sell it.** Take a photo of what you're selling and **Gemma 4** writes a listing you can post right away: a WhatsApp Status, an Instagram caption with Lagos hashtags, and a natural **Nigerian Pidgin** version. It also drafts replies to customers' DMs ("abeg how much last price?").
+**Snap it. Post it. Sell it.** Take a photo of what you're selling and **Gemma 4** writes a listing you can post right away: a WhatsApp Status, an Instagram caption with Lagos hashtags, and natural **Nigerian Pidgin** and **Yoruba** versions. It keeps your **catalog** on your phone and drafts replies to customers' DMs ("abeg how much last price?") using your real prices.
 
 Built at **Hacktoberfest Hack Day Yaba x AWS Student Builder Group Unilag** · Track: **E-Commerce** · MIT licensed.
 
 ---
 
 ## How to test (2 minutes)
+
+**Fastest: the live app.** Open the live link in the repo description (top right of this page) on your phone or laptop. Nothing to install. Free hosting sleeps when idle, so the first load can take ~30 seconds.
+
+**Or run it locally:**
 
 You need **Node.js 18+**. Nothing to install: the project has no dependencies.
 
@@ -36,8 +40,9 @@ This returns a sample listing so you can click through the whole flow. The badge
 
 1. Tap **"Tap to snap or upload"** and pick any product photo (shoes, a bag, food, a phone, a book).
 2. Optionally type a price (e.g. `8500`) and a location (e.g. `Yaba`), then press **Write my listing**.
-3. You'll get a product name, selling points, a WhatsApp Status, an Instagram caption, a Pidgin caption, a photo tip, and buyer FAQs. Press **Copy** or **Send on WhatsApp** on any of them.
-4. Scroll to **Reply to a customer**, paste `Abeg how much last price? I dey Akoka`, and press **Draft reply**. Gemma answers in Pidgin, stays polite, and doesn't invent a new price.
+3. You'll get a product name, selling points, a WhatsApp Status, an Instagram caption, Pidgin and Yoruba captions, a photo tip, and buyer FAQs. Press **Copy** or **Send on WhatsApp** on any of them.
+4. Press **Save to catalog**. The item appears under **My catalog**, and stays there after you reload the page because it's saved on your device.
+5. Scroll to **Reply to a customer**, paste `Abeg how much last price? I dey Akoka`, and press **Draft reply**. Gemma answers in Pidgin, stays polite, and only quotes prices from your catalog.
 
 Run the tests with `npm test`.
 
@@ -58,10 +63,11 @@ It's slow, repetitive, and a weak caption costs sales.
 | Step | What Gemma 4 does |
 |---|---|
 | Photo in | Looks at the image (multimodal) to work out what the product is, its condition and its visible selling points |
-| Listing out | Writes a WhatsApp Status, Instagram caption + hashtags, Pidgin caption, and a price hint |
+| Listing out | Writes a WhatsApp Status, Instagram caption + hashtags, Pidgin and Yoruba captions, and a price hint |
 | Coaching | Gives one concrete tip to make the photo sell better |
 | Buyer FAQ | Predicts the questions buyers will ask, with ready answers |
-| DM replies | Drafts a polite reply to a customer's message, matches their language (Pidgin or English), and never invents a price |
+| Catalog | Saves listings on the phone (localStorage, no account, no server database) |
+| DM replies | Drafts a polite reply to a customer's message using your whole catalog, matches their language (English, Pidgin or Yoruba), and never invents a price |
 
 Guardrails in the prompt: Gemma describes only what it can see plus the seller's notes, uses the seller's price exactly, and marks any price guess as an "estimate".
 
@@ -81,15 +87,20 @@ server.js           Node http server, zero dependencies
   POST /api/listing  photo + seller details -> Gemma 4 -> listing JSON
   POST /api/reply    listing + customer DM -> Gemma 4 -> reply text
 test/               node:test tests (run in demo mode)
+render.yaml         one-click deploy to Render (set GEMINI_API_KEY there)
 ```
 
-The API key stays on the server and is never sent to the browser.
+The API key stays on the server and is never sent to the browser. The catalog lives only in the seller's browser.
+
+## Deploy your own
+
+Click **New → Blueprint** on [Render](https://render.com), choose this repo, and paste your `GEMINI_API_KEY` when asked. `render.yaml` does the rest.
 
 ## Roadmap
 
 - WhatsApp Business bot: send a photo to a number and get the listing back
-- Catalog memory: keep your products and prices so DM replies get them right every time
-- Yoruba, Igbo and Hausa captions
+- Sync the catalog across devices and share it as a public storefront link
+- Igbo and Hausa captions
 - Run fully offline with Gemma on-device via Ollama for sellers with poor data
 
 ## License

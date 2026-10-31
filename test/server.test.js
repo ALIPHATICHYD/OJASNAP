@@ -27,3 +27,12 @@ test("demo endpoints respond", async () => {
     assert.notStrictEqual(trav.status, 200);
   } finally { server.close(); }
 });
+
+test("catalogText formats and caps the catalog", () => {
+  const { catalogText } = require("../server");
+  assert.strictEqual(catalogText([]), "(empty)");
+  assert.strictEqual(catalogText(null), "(empty)");
+  const out = catalogText([{ product_name: "Sneakers", price: "₦25,000", condition: "New" }]);
+  assert.match(out, /Sneakers \| ₦25,000 \| New/);
+  assert.strictEqual(catalogText(Array(80).fill({ product_name: "x" })).split("\n").length, 50);
+});

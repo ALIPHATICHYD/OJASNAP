@@ -27,6 +27,7 @@ Rules:
 - If the seller gave a price, use it exactly, in Naira (₦). If not, write "DM for price" in captions and give a cautious price_hint.
 - Keep captions short, warm and natural for Nigerian buyers. Emojis are fine but don't overdo it.
 - The Pidgin caption must be natural Nigerian Pidgin, not a word-for-word translation.
+- The Yoruba caption must be natural, everyday Lagos Yoruba with correct tone marks where you are confident; keep prices and brand words as-is.
 
 Reply with ONLY one JSON object, no markdown fences, with exactly these keys:
 {
@@ -37,15 +38,19 @@ Reply with ONLY one JSON object, no markdown fences, with exactly these keys:
   "whatsapp_status": "caption for WhatsApp Status, max 300 characters, ends with a call to action",
   "instagram_caption": "caption for Instagram, 2 to 4 short lines, then 6 to 10 hashtags including Lagos ones",
   "pidgin_caption": "same idea in Nigerian Pidgin, max 300 characters",
+  "yoruba_caption": "same idea in Yoruba, max 300 characters",
   "price_hint": "if no price was given, a cautious Naira range with the word 'estimate'; otherwise repeat the seller's price",
   "photo_tip": "one concrete tip to make this photo sell better",
   "faq": [{"q": "a question buyers will likely ask", "a": "a short answer the seller can send"}]
 }`;
 
-const REPLY_PROMPT = ({ listing, message, tone }) => `You are OjaSnap, helping a small Lagos seller reply to a customer on WhatsApp.
+const REPLY_PROMPT = ({ listing, catalog, message, tone }) => `You are OjaSnap, helping a small Lagos seller reply to a customer on WhatsApp.
 
-The product listing (JSON):
+The product the customer is most likely asking about (JSON):
 ${JSON.stringify(listing || {}, null, 2)}
+
+The seller's full catalog (name, price, condition). Use it if the customer asks about other items or what else is available:
+${catalogText(catalog)}
 
 The customer wrote:
 """${message}"""
@@ -54,10 +59,19 @@ Write ONE reply the seller can send as-is.
 - Tone: ${tone || "friendly and professional"}.
 - If the customer is bargaining ("last price", "reduce am"), stay polite, hold value, and you may offer a small gesture (e.g. free delivery within an area) only if it fits; never invent a new price the seller didn't give.
 - If they ask something the listing doesn't answer, say you'll confirm and ask a short follow-up question.
-- Match the customer's language: reply in Pidgin if they wrote in Pidgin, otherwise English.
+- Only quote prices that appear above. Never invent a price.
+- Match the customer's language: reply in Pidgin if they wrote in Pidgin, Yoruba if they wrote in Yoruba, otherwise English.
 - Max 3 short sentences. No markdown.
 
 Reply with ONLY the message text.`;
+
+function catalogText(catalog) {
+  if (!Array.isArray(catalog) || !catalog.length) return "(empty)";
+  return catalog
+    .slice(0, 50)
+    .map((c) => `- ${String(c.product_name || "Item").slice(0, 80)} | ${String(c.price || "DM for price").slice(0, 30)} | ${String(c.condition || "").slice(0, 20)}`)
+    .join("\n");
+}
 
 // ---------- Gemma via Gemini API ----------
 async function callGemma(parts, { thinking = "minimal" } = {}) {
@@ -121,6 +135,8 @@ const DEMO_LISTING = {
     "Your everyday bag, but make it Ankara. ✨\nRoomy, strong, and handmade in Lagos.\n₦8,500 · Lagos delivery available.\n#AnkaraBag #LagosVendor #ToteBag #MadeInNigeria #UnilagVendor #LagosFashion #ShopLagos #NaijaBrand",
   pidgin_caption:
     "Ankara tote don land! 😍 E big well well, laptop and books go enter. Na ₦8,500 only. We dey deliver anywhere for Lagos. DM sharp sharp!",
+  yoruba_caption:
+    "Àpò Ankara tuntun ti dé! 😍 Ó tóbi, laptop àti ìwé yóò wọ̀ ọ́. ₦8,500 péré. A ń fi ránṣẹ́ sí gbogbo Èkó. Ẹ DM wa kíákíá!",
   price_hint: "₦8,500",
   photo_tip: "Shoot it near a window in daylight, and add one photo of someone carrying it so buyers see the size.",
   faq: [
@@ -176,7 +192,7 @@ async function handleListing(req, res) {
 }
 
 async function handleReply(req, res) {
-  const { listing, message, tone } = await readBody(req);
+  const { listing, catalog, message, tone } = await readBody(req);
   if (!message) return send(res, 400, { error: "Paste the customer's message first." });
   if (DEMO) {
     const pidgin = /\b(abeg|how much|wetin|dey|last price|reduce|na)\b/i.test(message);
@@ -185,7 +201,7 @@ async function handleReply(req, res) {
       : "Thanks for reaching out! It's ₦8,500 and it's handmade with strong stitching. I can do free delivery within Yaba/Unilag. Shall I reserve one for you?";
     return send(res, 200, { reply, model: "demo-mode" });
   }
-  const reply = await callGemma([{ text: REPLY_PROMPT({ listing, message, tone }) }]);
+  const reply = await callGemma([{ text: REPLY_PROMPT({ listing, catalog, message, tone }) }]);
   send(res, 200, { reply: reply.replace(/^"|"$/g, ""), model: MODEL });
 }
 
@@ -230,4 +246,4 @@ function loadDotEnv() {
   } catch { /* no .env file */ }
 }
 
-module.exports = { extractJson, server };
+module.exports = { extractJson, catalogText, server };
